@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="report.paperformat" id="paperformat_attendance_recap_report">
+        <field name="name">paperformat.attendance.recap.report</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_width">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">30</field>
+        <field name="margin_right">5</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <report id="attendance_template_custom"
+        model="hr.attendance"
+        string="Print HR Attendance"
+        report_type="qweb-pdf"
+        name="hr_attendance_print.attendance_template_custom_id"
+        paperformat="paperformat_attendance_recap_report"
+        menu="False"/>
+
+        <!--report
+            id="hr_attendance_report_custom"
+            menu = 'False'
+            model="hr.attendance"
+            string="Print HR Attendance"
+            report_type="qweb-pdf"
+            name="hr_attendance_print.attendance_template_custom_id"
+            file="hr_attendance_print.attendance_template_custom_id"
+        /-->
+
+        <template id="attendance_template_custom_id">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.html_container">
+                    <t t-call="web.internal_layout">
+                        <div class="page">
+                            <div class="text-center">
+                                <h3>
+                                    <strong>Asistencias de: <span t-esc="doc.name"/></strong><br/>
+                                    <strong><span t-esc="data['start_date']" t-options='{"widget":"date"}'/>hasta</strong>
+                                    <strong t-esc="data['end_date']" t-options='{"widget":"date"}'/>
+                                </h3>
+                            </div>
+                            <table class="table table-responsive">
+                                <tr style="border: 2px solid black;">
+                                    <td><strong>Entrada</strong ></td>
+                                    <td><strong>Salida</strong></td>
+                                    <td><strong>Horas</strong></td>
+                                </tr>
+                                <t t-foreach ="data['attendance_data'][str(doc.id)]" t-as="line">
+                                    <tr style="border: 2px solid grey;">
+                                        <td><span t-esc="line['check_in']"/></td>
+                                        <td><span t-esc="line['check_out']"/></td>
+                                        <td><span t-esc="line['worked_hours']"/></td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </odoo>
