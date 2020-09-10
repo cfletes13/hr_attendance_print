@@ -4,16 +4,16 @@
     <record model="report.paperformat" id="paperformat_attendance_recap_report">
         <field name="name">paperformat.attendance.recap.report</field>
         <field name="default" eval="True"/>
-        <field name="format">A4</field>
+        <field name="format">Letter</field>
         <field name="page_width">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">30</field>
+        <field name="margin_top">10</field>
         <field name="margin_right">5</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">20</field>
+        <field name="header_spacing">10</field>
         <field name="dpi">90</field>
     </record>
 
@@ -35,35 +35,41 @@
             file="hr_attendance_print.attendance_template_custom_id"
         /-->
 
-        <template id="attendance_template_custom_id">
-            <t t-foreach="docs" t-as="doc">
-                <t t-call="web.html_container">
-                    <t t-call="web.internal_layout">
-                        <div class="page">
-                            <div class="text-center">
-                                <h3>
-                                    <strong>Asistencias de: <span t-esc="doc.name"/></strong><br/>
-                                    <strong><span t-esc="data['start_date']" t-options='{"widget":"date"}'/>hasta</strong>
-                                    <strong t-esc="data['end_date']" t-options='{"widget":"date"}'/>
-                                </h3>
-                            </div>
-                            <table class="table table-responsive">
-                                <tr style="border: 2px solid black;">
-                                    <td><strong>Entrada</strong ></td>
-                                    <td><strong>Salida</strong></td>
-                                    <td><strong>Horas</strong></td>
-                                </tr>
-                                <t t-foreach ="data['attendance_data'][str(doc.id)]" t-as="line">
-                                    <tr style="border: 2px solid grey;">
-                                        <td><span t-esc="line['check_in']"/></td>
-                                        <td><span t-esc="line['check_out']"/></td>
-                                        <td><span t-esc="line['worked_hours']"/></td>
-                                    </tr>
-                                </t>
-                            </table>
+    <template id="attendance_template_custom_id">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <div class="page">
+                    <div class="oe_structure"/>
+                        <div class="text-center">
+                            <h3>
+                                <strong>Asistencias de: <span t-esc="doc.name"/></strong><br/>
+                                <strong><span t-esc="data['start_date']" t-options='{"widget":"date"}'/> hasta </strong>
+                                <strong t-esc="data['end_date']" t-options='{"widget":"date"}'/>
+                            </h3>
                         </div>
-                    </t>
+
+                        <table class="table table-striped table-sm table-borderless" cellspacing="0" width="100%">
+                            <tr style="border: 2px solid black;">
+                                <td><strong>Entrada</strong ></td>
+                                <td><strong>Salida</strong></td>
+                                <td><strong>Horas</strong></td>
+                            </tr>
+                            <t t-foreach ="data['attendance_data'][str(doc.id)]" t-as="line">
+                                <tr style="border: 2px solid grey;">
+                                    <td><span t-esc="line['check_in']"/></td>
+                                    <td><span t-esc="line['check_out']"/></td>
+                                    <td><span t-esc="line['worked_hours']"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
                 </t>
             </t>
-        </template>
-    </odoo>
+        </t>
+    </template>
+</odoo>
