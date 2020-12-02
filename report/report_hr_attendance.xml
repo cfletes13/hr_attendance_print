@@ -59,13 +59,20 @@
                                 <td><strong>Salida</strong></td>
                                 <td><strong>Horas</strong></td>
                             </tr>
+                            <t t-set="total" t-value="0"/>
                             <t t-foreach ="data['attendance_data'][str(doc.id)]" t-as="line">
+                                <t t-set="total" t-value="line['total_hours']"/>
                                 <tr style="border: 2px solid grey;">
                                     <td><span t-esc="line['check_in']"/></td>
                                     <td><span t-esc="line['check_out']"/></td>
                                     <td><span t-esc="line['worked_hours']"/></td>
                                 </tr>
                             </t>
+                            <tr style="border: 2px solid grey; font-size:14px;">
+                                <td></td>
+                                <td></td>
+                                <td><b><h4><span t-esc="total"/></h4></b></td>
+                            </tr>
                         </table>
                         <div class="text-center">
                             <span>Firma de Conformidad</span><br/><br/><br/>

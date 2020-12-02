@@ -31,11 +31,16 @@ class EmployeePrint(models.TransientModel):
         atten_obj = self.env['hr.attendance']
         attendance_data = {}
         emp_ids = []
+        employee_id = False
+        sum = timedelta()
+
         if self.employee_ids:
             for emp in self.employee_ids:
+                sum = timedelta()
                 atten_record = atten_obj.search([('check_in', '>=', self.start_date), (
                     'check_out', '<=', self.end_date), ('employee_id', '=', emp.id)], order='check_in')
                 for rec in atten_record:
+                    employee_id = rec.employee_id.id
                     from_zone = gettz('UTC')
                     to_zone = gettz(self.env.user.tz)
 
@@ -68,20 +73,28 @@ class EmployeePrint(models.TransientModel):
                         int(hour), width=2)+':{0:0{width}}'.format(int(minute), width=2)
 
                     # w_hours = '{:,.2f}'.format(rec.worked_hours)
+                    (h, m) = w_hours.split(':')
+                    d = timedelta(hours=int(h), minutes=int(m))
+                    sum += d
+
+                    totsec = sum.total_seconds()
+                    h = totsec//3600
+                    m = (totsec%3600) // 60
 
                     if rec.employee_id.id not in attendance_data:
                         emp_ids.append(rec.employee_id.id)
                         #attendance_data[rec.employee_id.id] = [{'check_in' : rec.check_in,'check_out' : rec.check_out, 'sheet' : rec.sheet_id.name, 'name' : rec.employee_id.name}]
                         attendance_data[rec.employee_id.id] = [
-                            {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name}]           # odoo 11
+                            {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name, 'total_hours':str("%d:%d" %(h,m))}]           # odoo 11
                     else:
                         #attendance_data[rec.employee_id.id].append({'check_in' : rec.check_in,'check_out' : rec.check_out, 'sheet' : rec.sheet_id.name, 'name' : rec.employee_id.name})
                         attendance_data[rec.employee_id.id].append(
-                            {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name})            # odoo 11
+                            {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name, 'total_hours':str("%d:%d" %(h,m))})            # odoo 11
 
             if not attendance_data:
                 print('ttttttttttttttttttttttttttttttttttttttttttttttttttttttt', attendance_data)
                 raise Warning(_('No Attendance for this date.'))
+
             data = self.read()[0]
             data['ids'] = emp_ids
             data['model'] = 'hr.attendance'
@@ -89,6 +102,7 @@ class EmployeePrint(models.TransientModel):
         else:
             atten_record = atten_obj.search(
                 [('check_in', '>=', self.start_date), ('check_out', '<=', self.end_date)], order='check_in')
+            sum = timedelta()
             for rec in atten_record:
                 from_zone = gettz('UTC')
                 to_zone = gettz(self.env.user.tz)
@@ -123,15 +137,24 @@ class EmployeePrint(models.TransientModel):
                 w_hours = '{0:0{width}}'.format(int(hour), width=2) + \
                     ':{0:0{width}}'.format(int(minute), width=2)
 
+                # w_hours = '{:,.2f}'.format(rec.worked_hours)
+                (h, m) = w_hours.split(':')
+                d = timedelta(hours=int(h), minutes=int(m))
+                sum += d
+
+                totsec = sum.total_seconds()
+                h = totsec//3600
+                m = (totsec%3600) // 60
+
                 if rec.employee_id.id not in attendance_data:
                     emp_ids.append(rec.employee_id.id)
                     #attendance_data[rec.employee_id.id] = [{'check_in' : rec.check_in,'check_out' : rec.check_out, 'sheet' : rec.sheet_id.name, 'name' : rec.employee_id.name}]
                     attendance_data[rec.employee_id.id] = [
-                        {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name}]              # odoo 11
+                        {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name, 'total_hours':str("%d:%d" %(h,m))}]              # odoo 11
                 else:
                     #attendance_data[rec.employee_id.id].append({'check_in' : rec.check_in,'check_out' : rec.check_out, 'sheet' : rec.sheet_id.name, 'name' : rec.employee_id.name})
                     attendance_data[rec.employee_id.id].append(
-                        {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name})               # odoo 11
+                        {'check_in': ci, 'check_out': ci_out, 'worked_hours': w_hours, 'name': rec.employee_id.name, 'total_hours':str("%d:%d" %(h,m))})               # odoo 11
             if not attendance_data:
                 raise Warning(_('No Attendance for this date.'))
             data = self.read()[0]
